@@ -21,16 +21,23 @@
       <div class="form-group">
         <table id="grid" border="1"></table>
       </div>
-      <div class="form-group form-inline">
+      <div id="form_controls" class="form-group form-inline">
         <button class="btn btn-primary" id="new-game-btn">New Game</button>
         <button class="btn btn-default" id="reset-btn">Reset</button>
-        <button class="btn btn-default" id="solve-btn">Solve for me</button>     
+        <button class="btn btn-default" id="solve-btn">Solve for me</button>
+        <button class="btn btn-default" id="heuristic-btn1">Heuristic 1</button>
+        <button class="btn btn-default" id="heuristic-btn2">Heuristic 2</button>
+        <label>Colors: </label>
+        <select id="colors" class="form-control input-sm">
+          <option value=3>3</option>
+          <option value=4>4</option>
+          <option value=5>5</option>
+          <option selected value=6>6</option>
+        </select>
         <label>Size: </label>
         <select id="size" class="form-control input-sm">
-          <option value="7">7</option>
-          <option selected value="14">14</option>
-          <option value="21">21</option>
-          <option value="28">28</option>
+          <option value=10>10</option>
+          <option selected value=14>14</option>
         </select>
         <button class="btn btn-primary" data-toggle="modal" data-target="#help">Help</button> </div>
       <div id="palette"></div>

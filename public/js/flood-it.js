@@ -1,3 +1,5 @@
+const HEURISTIC1 = 1;
+const HEURISTIC2 = 2;
 var size = 14;    //the size of the grid
 var turn;
 var grid = [];    //internal grid
@@ -10,6 +12,7 @@ var solverMode = false;
 var solved = false;
 var solveLabel;
 var colours = [];
+var numColors = 6;
 
 /**
  * Messages
@@ -34,6 +37,10 @@ function makeGrid() {
   solved = false;
   
   //initialize grids
+  grid = []
+  original = [];
+  cells = [];
+  seen = [];
   for(var i = 0; i < size; i++) {
     grid[i] = [];
     original[i] = [];
@@ -207,6 +214,12 @@ function _inspect(i, j) {
   }
 }
 
+function setControlsDisabled(isEnabled) {
+  $("#form_controls :button").attr("disabled", isEnabled);
+  $("#form_controls .form-control").attr("disabled", isEnabled);
+  $("#palette :button").attr("disabled", isEnabled);
+}
+
 function inspect() {
   clearSeen();
   for(var i = 0; i < colours.length; i++) {
@@ -258,6 +271,32 @@ function solve() {
   });
 }
 
+function getHeuristicSolution(heuristic) {
+  console.log(heuristic);
+  var gridData = {
+    'grid': grid,
+    'numColors': numColors,
+    'greedyDepth': computerSolution,
+    'heuristic': heuristic
+  };
+  $.post('', JSON.stringify(gridData), function(data, status){
+    console.log(data);
+    
+    var currentAction = 0;
+    setControlsDisabled(true);
+    var solutionTimer = setInterval(function(){
+      solverMode = true;
+      flood(data[currentAction]);
+      currentAction += 1;
+      if (currentAction == data.length) {
+        clearInterval(solutionTimer);
+        setControlsDisabled(false);
+      }
+      solverMode = false;
+    }, 500);
+  });
+}
+
 $(document).ready(function() {
 
   $('[data-toggle="popover"]').popover();
@@ -270,6 +309,14 @@ $(document).ready(function() {
   $('#solve-btn').click(solve);
   $('#new-game-btn').click(makeGrid);
   $('#reset-btn').click(reset);
+  $('#heuristic-btn1').click(
+    function(){
+      getHeuristicSolution(HEURISTIC1);
+    });
+  $('#heuristic-btn2').click(
+    function(){
+      getHeuristicSolution(HEURISTIC2);
+    });
 
   $themes = $('#themes');
   for(var i = 0; i < themes.length; i++) {
@@ -279,8 +326,15 @@ $(document).ready(function() {
     $themes.append($option);
   }
 
+  $('#colors').change(function(){
+    numColors = $(this).val();
+    colours = themes[Number($("#themes").find('option:selected').val())].colours.slice(0, numColors);
+    makeGrid();
+    makeControls();
+  });
+
   $('#themes').change(function() {
-    colours = themes[Number($(this).find('option:selected').val())].colours;
+    colours = themes[Number($(this).find('option:selected').val())].colours.slice(0, numColors);
     refresh();
     makeControls();
   });
